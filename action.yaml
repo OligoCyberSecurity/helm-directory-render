@@ -1,0 +1,36 @@
+# action.yaml
+name: 'Helm Chart Tree Renderer'
+description: 'A Github Action that takes an input and returns directory of rendered templates'
+inputs:
+  environment:
+    description: 'Environment to render the templates for'
+    required: true
+    default: 'dev'
+  directory_path_query:
+    description: 'e.g. /helm/'
+    required: true
+    default: "/helm/"
+outputs:
+  rendered_templates:
+    description: 'Square of the input'
+    # need to specify the extra `value` field for `composite` actions
+    value: ${{ steps.get-results.outputs.num_squared }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install Dependencies
+      run: pip install -r requirements.txt
+      shell: bash
+    - name: Pass Inputs to Shell
+      run: |
+          echo "INPUT_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
+          echo "INPUT_DIRECTORY=${{ inputs.directory_path_query }}" >> $GITHUB_ENV
+      shell: bash
+    - name: Fetch the number's square
+      id: get-results
+      run: python src/traverse.py
+      shell: bash
