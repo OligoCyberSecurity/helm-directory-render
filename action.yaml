@@ -6,10 +6,15 @@ inputs:
     description: 'Environment to render the templates for'
     required: true
     default: 'dev'
-  directory_path_query:
+  directory_path:
     description: 'e.g. /helm/'
     required: true
-    default: "/helm/"
+  rendered_path:
+    description: 'e.g. /rendered/'
+    default: '/rendered/'
+  pattern:
+    description: 'Pattern to match the files'    
+    default: "helm"
 outputs:
   rendered_templates:
     description: 'Square of the input'
@@ -28,7 +33,9 @@ runs:
     - name: Pass Inputs to Shell
       run: |
           echo "INPUT_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
-          echo "INPUT_DIRECTORY=${{ inputs.directory_path_query }}" >> $GITHUB_ENV
+          echo "INPUT_DIRECTORY=${{ inputs.directory_path }}" >> $GITHUB_ENV
+          echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
+          echo "INPUT_RENDERED_DIR=${{ inputs.rendered_path }}" >> $GITHUB_ENV
       shell: bash
     - name: Fetch the number's square
       id: get-results
