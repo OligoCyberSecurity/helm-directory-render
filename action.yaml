@@ -15,6 +15,9 @@ inputs:
   pattern:
     description: 'Pattern to match the files'    
     default: "helm"
+  chart:
+    description: 'Chart to render'
+    required: true
 outputs:
   rendered_templates:
     description: 'Square of the input'
@@ -36,6 +39,7 @@ runs:
           echo "INPUT_DIRECTORY=${{ inputs.directory_path }}" >> $GITHUB_ENV
           echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
           echo "INPUT_RENDERED_DIR=${{ inputs.rendered_path }}" >> $GITHUB_ENV
+          echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
       shell: bash
     - name: Fetch the number's square
       id: get-results
