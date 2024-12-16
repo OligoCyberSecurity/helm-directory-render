@@ -49,8 +49,12 @@ if env and root_dir and pattern and chart_dir:
                     base_values = base_job_path + "/" + [i if i.endswith(".yaml") else ""  for i in os.listdir(base_job_path)][0]
                     env_values = job_path + "/" + [i if i.endswith(".yaml") else ""  for i in os.listdir(job_path)][0]
                     helm_exec_string = f"helm template {job} {chart_dir} -f {base_values} -f {env_values} --output-dir {job_rendered_path}/"
+                    job_dict[job]["helm_exec_string"] = helm_exec_string
                     logging.info(helm_exec_string)
-                    subprocess.run(helm_exec_string, shell=True)
+                    res = subprocess.run(helm_exec_string, shell=True)
+                    job_dict[job]["stdout"] = res.stdout
+                    job_dict[job]["stderr"] = res.stderr
+                    
                     # logging.info("Base values: " + str(base_values))
                 else:
                     logging.info("Job rendered path does not exist: " + job_rendered_path)
@@ -61,4 +65,4 @@ for item in output:
     print(f"{item}")
     
 # to set output, print to shell in following syntax
-print("::set-output name=num_squared:: " + json.dumps(list(output)))
+print("::set-output name=jobs:: " + json.dumps(job_dict))
