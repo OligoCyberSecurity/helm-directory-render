@@ -37,7 +37,7 @@ for root, _dirs, _files in os.walk(root_dir):
                                        job}/{env}.yaml", rendered_path=f"{rendered_path}/{env}/{job}", name=job, chart_dir=chart_dir)
             t_record.helm_template()
             # walk the rendered path and mv the files to the correct location
-            rename_rendered_files(t_record.rendered_path, [])
+            rename_rendered_files(t_record.rendered_path)
             # delete empty folders
             output.append(t_record)
         delete_empty_folders(rendered_path)
