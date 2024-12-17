@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
-import subprocess
 import os
+import subprocess
+from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class TraversalRecord(BaseModel):

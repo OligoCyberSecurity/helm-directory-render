@@ -1,4 +1,5 @@
 import os
+import logging
 
 def delete_empty_folders(root):
     deleted = set()
@@ -10,15 +11,19 @@ def delete_empty_folders(root):
                 break
         if not any(files) and not still_has_subdirs:
             os.rmdir(current_dir)
+            logging.info("Deleted empty folder: %s", current_dir)
             deleted.add(current_dir)
     return deleted
 
-def rename_rendered_files(job_rendered_path,output):
-    # walk the rendered path and mv the files to the correct location
-    for root, dirs, files in os.walk(job_rendered_path):
+def rename_rendered_files(job_rendered_path):
+    """walk the rendered path and mv the files to the correct location
+
+    Args:
+        job_rendered_path (str): _description_
+    """
+    for root, _dirs, files in os.walk(job_rendered_path):
         for file in files:
             if file.endswith(".yaml"):
                 output_path = f"{job_rendered_path}/{file}"
                 os.rename(f"{root}/{file}", f"{output_path}")
-                output.append(output_path)
-    return output
+                logging.debug("Renamed file: %s", output_path)

@@ -24,8 +24,8 @@ if not env or not root_dir or not pattern or not chart_dir:
 PATTERN_REG = re.compile(pattern)  # Match all files ending with input pattern"
 
 output = list()
-for item in os.walk(root_dir):
-    item_path = Path(item[0])
+for root, _dirs, _files in os.walk(root_dir):
+    item_path = Path(root)
     env_item_path = item_path.absolute().as_posix()
     jobs_list = os.listdir(env_item_path)
     rendered_path = f"{item_path.parent.absolute().as_posix()
@@ -39,9 +39,8 @@ for item in os.walk(root_dir):
             # walk the rendered path and mv the files to the correct location
             rename_rendered_files(t_record.rendered_path, [])
             # delete empty folders
-            delete_empty_folders(t_record.rendered_path)
             output.append(t_record)
-
+        delete_empty_folders(rendered_path)
 # to set output, print to shell in following syntax
 print("::set-output name=jobs:: " +
       json.dumps([i.model_dump() for i in output]))
