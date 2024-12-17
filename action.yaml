@@ -41,7 +41,7 @@ runs:
           echo "INPUT_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
           echo "INPUT_DIRECTORY=${{ inputs.directory_path }}" >> $GITHUB_ENV
           echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
-          echo "INPUT_RENDERED_DIR=${{ inputs.rendered_path }}" >> $GITHUB_ENV
+          echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
           echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
       shell: bash
     - name: Fetch the number's square
