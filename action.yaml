@@ -30,6 +30,9 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+    - name: install helm
+      uses: azure/setup-helm@v4.2.0
+
     - name: Install Dependencies
       run: pip install -r requirements.txt
       shell: bash
