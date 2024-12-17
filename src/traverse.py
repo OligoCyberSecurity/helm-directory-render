@@ -71,13 +71,11 @@ if env and root_dir and pattern and chart_dir:
                         for file in files:
                             if file.endswith(".yaml"):
                                 output_path = f"{job_rendered_path}/{file}"
-                                # print(dirs)
-                                # logging.info(f"Moving {root}/{file} to {output_path}")
                                 os.rename(f"{root}/{file}", f"{output_path}")
                                 output.append(output_path)
                     # delete empty folders
                     delete_empty_folders(job_rendered_path)
-                    # logging.info("Base values: " + str(base_values))
+                    
                 else:
                     logging.info("Job path does not exist: %s", job_path)
 else:
