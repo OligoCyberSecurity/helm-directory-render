@@ -22,7 +22,7 @@ outputs:
   rendered_templates:
     description: 'Square of the input'
     # need to specify the extra `value` field for `composite` actions
-    value: ${{ steps.get-results.outputs.num_squared }}
+    value: ${{ steps.get-results.outputs.jobs }}
 runs:
   using: 'composite'
   steps:
