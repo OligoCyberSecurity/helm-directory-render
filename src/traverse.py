@@ -6,7 +6,6 @@ import logging
 import json
 from pathlib import Path
 from models import TraversalRecord
-# from utils import delete_empty_folders, rename_rendered_files
 # Configure logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
