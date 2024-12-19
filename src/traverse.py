@@ -6,7 +6,7 @@ import logging
 import json
 from pathlib import Path
 from models import TraversalRecord
-from utils import delete_empty_folders, rename_rendered_files
+# from utils import delete_empty_folders, rename_rendered_files
 # Configure logging
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -36,11 +36,8 @@ for root, _dirs, _files in os.walk(root_dir):
             t_record = TraversalRecord(base_path=f"{env_item_path}/{job}/base.yaml", env_path=f"{env_item_path}/{
                                        job}/{env}.yaml", rendered_path=f"{rendered_path}/{env}/{job}", name=job, chart_dir=chart_dir)
             t_record.helm_template()
-            # walk the rendered path and mv the files to the correct location
-            rename_rendered_files(t_record.rendered_path)
-            # delete empty folders
             output.append(t_record)
-        delete_empty_folders(rendered_path)
+
 # to set output, print to shell in following syntax
 print("::set-output name=jobs:: " +
       json.dumps([i.model_dump() for i in output]))

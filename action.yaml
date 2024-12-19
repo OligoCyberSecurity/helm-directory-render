@@ -20,7 +20,7 @@ inputs:
     required: true
 outputs:
   rendered_templates:
-    description: 'Square of the input'
+    description: 'rendered charts records'
     # need to specify the extra `value` field for `composite` actions
     value: ${{ steps.get-results.outputs.jobs }}
 runs:
@@ -44,7 +44,7 @@ runs:
           echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
           echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
       shell: bash
-    - name: Fetch the number's square
+    - name: Fetch rendered list
       id: get-results
       run: python src/traverse.py
       shell: bash
