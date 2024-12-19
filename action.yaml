@@ -15,11 +15,14 @@ inputs:
   pattern:
     description: 'Pattern to match the files'    
     default: "helm"
+  chart:
+    description: 'Chart to render'
+    required: true
 outputs:
   rendered_templates:
-    description: 'Square of the input'
+    description: 'rendered charts records'
     # need to specify the extra `value` field for `composite` actions
-    value: ${{ steps.get-results.outputs.num_squared }}
+    value: ${{ steps.get-results.outputs.jobs }}
 runs:
   using: 'composite'
   steps:
@@ -27,6 +30,9 @@ runs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+    - name: install helm
+      uses: azure/setup-helm@v4.2.0
+
     - name: Install Dependencies
       run: pip install -r requirements.txt
       shell: bash
@@ -35,9 +41,10 @@ runs:
           echo "INPUT_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
           echo "INPUT_DIRECTORY=${{ inputs.directory_path }}" >> $GITHUB_ENV
           echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
-          echo "INPUT_RENDERED_DIR=${{ inputs.rendered_path }}" >> $GITHUB_ENV
+          echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
+          echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
       shell: bash
-    - name: Fetch the number's square
+    - name: Fetch rendered list
       id: get-results
       run: python src/traverse.py
       shell: bash
