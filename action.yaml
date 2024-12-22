@@ -1,48 +1,52 @@
 # action.yaml
-name: 'Helm Chart Tree Renderer'
-description: 'A Github Action that takes an input and returns directory of rendered templates'
+name: "Helm Chart Tree Renderer"
+description: "A Github Action that takes an input and returns directory of rendered templates"
 inputs:
   environment:
-    description: 'Environment to render the templates for'
+    description: "Environment to render the templates for"
     required: true
-    default: 'dev'
+    default: "dev"
   directory_path:
-    description: 'e.g. /helm/'
+    description: "e.g. /helm/"
     required: true
   rendered_path:
-    description: 'e.g. /rendered/'
-    default: '/rendered/'
+    description: "e.g. /rendered/"
+    default: "/rendered/"
   pattern:
-    description: 'Pattern to match the files'    
+    description: "Pattern to match the files"
     default: "helm"
   chart:
-    description: 'Chart to render'
+    description: "Chart to render"
     required: true
 outputs:
   rendered_templates:
-    description: 'rendered charts records'
+    description: "rendered charts records"
     # need to specify the extra `value` field for `composite` actions
     value: ${{ steps.get-results.outputs.jobs }}
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: "3.11"
     - name: install helm
       uses: azure/setup-helm@v4.2.0
 
     - name: Install Dependencies
       run: pip install -r ${{ github.action_path }}/requirements.txt
       shell: bash
+    - name: Pass env to Shell
+      run: echo "INPUT_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
+      shell: bash
+    - name: Pass dir to Shell
+      run: echo "INPUT_DIRECTORY=${{ inputs.directory_path }}" >> $GITHUB_ENV
+      shell: bash
     - name: Pass Inputs to Shell
       run: |
-          echo "INPUT_ENVIRONMENT=${{ inputs.environment }}" >> $GITHUB_ENV
-          echo "INPUT_DIRECTORY=${{ inputs.directory_path }}" >> $GITHUB_ENV
-          echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
-          echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
-          echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
+        echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
+        echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
+        echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
       shell: bash
     - name: Fetch rendered list
       id: get-results
