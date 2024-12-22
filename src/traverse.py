@@ -31,8 +31,7 @@ for root, _, _ in os.walk(root_dir):
     if PATTERN_REG.search(env_item_path) and os.path.exists(rendered_path):
         logging.info("Found dir: %s %s", env_item_path, rendered_path)
         for job in jobs_list:
-            t_record = TraversalRecord(base_path=f"{env_item_path}/{job}/base.yaml", env_path=f"{env_item_path}/{
-                                       job}/{env}.yaml", rendered_path=f"{rendered_path}/{env}/{job}", name=job, chart_name=chart_name)
+            t_record = TraversalRecord(base_path=f"{env_item_path}/{job}/base.yaml", env_path=f"{env_item_path}/{job}/{env}.yaml", rendered_path=f"{rendered_path}/{env}/{job}", name=job, chart_name=chart_name)
             t_record.helm_template()
             output.append(t_record)
 
