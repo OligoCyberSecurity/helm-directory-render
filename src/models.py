@@ -1,4 +1,3 @@
-import logging
 import os
 import shutil
 import subprocess
@@ -22,12 +21,9 @@ class TraversalRecord(BaseModel):
         return f"helm template {self.name} {self.chart_name} -f {self.base_path} -f {self.env_path} --output-dir {self.rendered_path}"
 
     def helm_template(self):
-        if not os.path.exists(self.rendered_path):
-            logging.warning(
-                "Job path does not exist: %s creating it", self.rendered_path)
-            os.makedirs(self.rendered_path)
-        else:
+        if os.path.exists(self.rendered_path):
             shutil.rmtree(self.rendered_path + "/")
+
         res = subprocess.run(self.helm_exec_string(), shell=True, check=True)
 
         res.check_returncode()
