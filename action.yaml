@@ -32,7 +32,7 @@ runs:
         python-version: "3.11"
     - name: install helm
       uses: azure/setup-helm@v4.2.0
-
+    
     - name: Install Dependencies
       run: pip install -r ${{ github.action_path }}/requirements.txt
       shell: bash
@@ -51,6 +51,9 @@ runs:
     - name: Pass chart to Shell
       shell: bash
       run: echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
+    - name: dep init
+      shell: bash
+      run: helm dependency build
     - name: Fetch rendered list
       id: get-results
       run: python ${{ github.action_path }}/src/traverse.py
