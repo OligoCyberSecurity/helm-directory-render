@@ -42,12 +42,15 @@ runs:
     - name: Pass dir to Shell
       run: echo "INPUT_DIRECTORY=${{ inputs.directory_path }}" >> $GITHUB_ENV
       shell: bash
-    - name: Pass Inputs to Shell
-      run: |
-        echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
-        echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
-        echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
+    - name: Pass pattern to Shell
       shell: bash
+      run: echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
+    - name: Pass rendered_path to Shell
+      run: echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
+      shell: bash
+    - name: Pass chart to Shell
+      shell: bash
+      run: echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
     - name: Fetch rendered list
       id: get-results
       run: python ${{ github.action_path }}/src/traverse.py
