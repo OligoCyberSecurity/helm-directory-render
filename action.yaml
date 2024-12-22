@@ -53,7 +53,7 @@ runs:
       run: echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
     - name: dep init
       shell: bash
-      run: helm dependency build
+      run: cd $INPUT_CHART && helm dependency build 
     - name: Fetch rendered list
       id: get-results
       run: python ${{ github.action_path }}/src/traverse.py
