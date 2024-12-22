@@ -34,7 +34,7 @@ runs:
       uses: azure/setup-helm@v4.2.0
 
     - name: Install Dependencies
-      run: pip install -r requirements.txt
+      run: pip install -r ${{ github.action_path }}/requirements.txt
       shell: bash
     - name: Pass Inputs to Shell
       run: |
