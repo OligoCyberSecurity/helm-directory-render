@@ -28,7 +28,7 @@ PATTERN_REG = re.compile(pattern)  # Match all files ending with input pattern"
 output = list()
 templates: List[TraversalRecord] = []
 output_path = os.path.join(input_path, rendered_path_input)
-for root, dirs, files in os.walk(input_path):
+for root, _, files in os.walk(input_path):
     # in root dir we have globals.yaml but in every other dir we have base, dev, prod...
     if len(files) > 1 and PATTERN_REG.search(root):
         component_path = root.replace(f'{input_path}/{pattern}/', "")
@@ -45,6 +45,7 @@ for root, dirs, files in os.walk(input_path):
 for template in templates:
     template.helm_template()
     output.append(template)
+    template.normalize_path()
 
 # to set output, print to shell in following syntax
 print("::set-output name=jobs:: " +
