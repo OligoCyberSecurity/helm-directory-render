@@ -46,5 +46,5 @@ runs:
       shell: bash
     - name: Fetch rendered list
       id: get-results
-      run: python src/traverse.py
+      run: python ${{ github.action_path }}/src/traverse.py
       shell: bash
