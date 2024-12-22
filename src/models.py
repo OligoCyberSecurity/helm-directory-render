@@ -14,12 +14,12 @@ class TraversalRecord(BaseModel):
     """
     base_path: str
     env_path: str
-    chart_dir: str
+    chart_name: str
     rendered_path: str
     name: str = Field(init=True)
 
     def helm_exec_string(self):
-        return f"helm template {self.name} {self.chart_dir} -f {self.base_path} -f {self.env_path} --output-dir {self.rendered_path}"
+        return f"helm template {self.name} {self.chart_name} -f {self.base_path} -f {self.env_path} --output-dir {self.rendered_path}"
 
     def helm_template(self):
         if not os.path.exists(self.rendered_path):

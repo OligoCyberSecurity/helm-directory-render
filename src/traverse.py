@@ -14,16 +14,16 @@ logging.basicConfig(level=logging.INFO,
 env = os.environ.get("INPUT_ENVIRONMENT")
 root_dir = os.environ.get("INPUT_DIRECTORY")
 pattern = os.environ.get("INPUT_PATTERN")
-chart_dir = os.environ.get("INPUT_CHART")
+chart_name = os.environ.get("INPUT_CHART")
 rendered_path_input = os.environ.get("INPUT_RENDERED_PATH", "rendered").strip()
 # Check if required inputs are provided
-if not env or not root_dir or not pattern or not chart_dir:
+if not env or not root_dir or not pattern or not chart_name:
     logging.error("Missing required input")
     sys.exit(1)
 PATTERN_REG = re.compile(pattern)  # Match all files ending with input pattern"
 
 output = list()
-for root, _dirs, _files in os.walk(root_dir):
+for root, _, _ in os.walk(root_dir):
     item_path = Path(root)
     env_item_path = item_path.absolute().as_posix()
     jobs_list = os.listdir(env_item_path)
@@ -33,7 +33,7 @@ for root, _dirs, _files in os.walk(root_dir):
         logging.info("Found dir: %s %s", env_item_path, rendered_path)
         for job in jobs_list:
             t_record = TraversalRecord(base_path=f"{env_item_path}/{job}/base.yaml", env_path=f"{env_item_path}/{
-                                       job}/{env}.yaml", rendered_path=f"{rendered_path}/{env}/{job}", name=job, chart_dir=chart_dir)
+                                       job}/{env}.yaml", rendered_path=f"{rendered_path}/{env}/{job}", name=job, chart_name=chart_name)
             t_record.helm_template()
             output.append(t_record)
 
