@@ -14,10 +14,13 @@ inputs:
     default: "/rendered/"
   pattern:
     description: "Pattern to match the files"
-    default: "helm"
+    default: "helm/"
   chart:
     description: "Chart to render"
     required: true
+  use_globals:
+    description: "Use global values"
+    default: "false"
 outputs:
   rendered_templates:
     description: "rendered charts records"
@@ -32,7 +35,7 @@ runs:
         python-version: "3.11"
     - name: install helm
       uses: azure/setup-helm@v4.2.0
-    
+
     - name: Install Dependencies
       run: pip install -r ${{ github.action_path }}/requirements.txt
       shell: bash
@@ -45,6 +48,9 @@ runs:
     - name: Pass pattern to Shell
       shell: bash
       run: echo "INPUT_PATTERN=${{ inputs.pattern }}" >> $GITHUB_ENV
+    - name: Pass use_globals to Shell
+      shell: bash
+      run: echo "INPUT_USE_GLOBALs=${{ inputs.use_globals }}" >> $GITHUB_ENV
     - name: Pass rendered_path to Shell
       run: echo "INPUT_RENDERED_PATH=${{ inputs.rendered_path }}" >> $GITHUB_ENV
       shell: bash
@@ -53,7 +59,7 @@ runs:
       run: echo "INPUT_CHART=${{ inputs.chart }}" >> $GITHUB_ENV
     - name: dep init
       shell: bash
-      run: cd $INPUT_CHART && helm dependency build 
+      run: cd $INPUT_CHART && helm dependency build
     - name: Fetch rendered list
       id: get-results
       run: python ${{ github.action_path }}/src/traverse.py
