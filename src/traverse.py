@@ -27,8 +27,7 @@ for root, _, _ in os.walk(root_dir):
     item_path = Path(root)
     env_item_path = item_path.absolute().as_posix()
     jobs_list = os.listdir(env_item_path)
-    rendered_path = f"{item_path.parent.absolute().as_posix()
-                       }/{rendered_path_input}"
+    rendered_path = f"{item_path.parent.absolute().as_posix()}/{rendered_path_input}"
     if PATTERN_REG.search(env_item_path) and os.path.exists(rendered_path):
         logging.info("Found dir: %s %s", env_item_path, rendered_path)
         for job in jobs_list:
