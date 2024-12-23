@@ -34,7 +34,9 @@ class TraversalRecord(BaseModel):
 
     def helm_exec_string(self):
         cmd = ["helm", "template", self.instance,
-               f'charts/{self.chart_name}', "--output-dir", self.output_dir]
+               f'charts/{self.chart_name}',
+               "--output-dir", self.output_dir,
+               "--set", f"clusterName={self.env}"]
         for values in self.get_values_path:
             cmd.append("-f")
             cmd.append(values)
