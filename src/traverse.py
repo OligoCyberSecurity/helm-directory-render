@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO,
 
 # get the input and convert it to int
 env = os.environ.get("INPUT_ENVIRONMENT")
-input_path = os.environ.get("INPUT_DIRECTORY").rstrip("/") + "/"
+input_path = os.environ.get("INPUT_DIRECTORY").rstrip("/")
 pattern = os.environ.get("INPUT_PATTERN")
 chart_name = os.environ.get("INPUT_CHART")
 rendered_path_input = os.environ.get("INPUT_RENDERED_PATH", "rendered").strip()
