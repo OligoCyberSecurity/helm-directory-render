@@ -14,7 +14,7 @@ inputs:
     default: "/rendered/"
   pattern:
     description: "Pattern to match the files"
-    default: "helm/"
+    default: "helm"
   chart:
     description: "Chart to render"
     required: true
