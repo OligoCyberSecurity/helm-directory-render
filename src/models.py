@@ -14,21 +14,30 @@ class TraversalRecord(BaseModel):
     input_path: str
     env: str
     chart_name: str
-    component_path: str
+    values_path: str
     instance: str
     helm_path: str = Field(default="helm")
     rendered_path: str = Field(default="rendered")
 
-    def get_values_path(self, values_file: str):
-        return os.path.join(self.input_path, self.helm_path, self.component_path, values_file)
+    @property
+    def get_values_path(self):
+        return [os.path.join(self.input_path, self.helm_path, self.component_path, f) for f in ["base.yaml", f"{self.env}.yaml"]]
 
     @property
     def output_dir(self):
         return os.path.join(self.input_path, self.rendered_path, self.env, self.component_path)
 
+    @property
+    def component_path(self):
+        helm_path = os.path.join(self.input_path, self.helm_path) + "/"
+        return self.values_path.replace(helm_path, "")
+
     def helm_exec_string(self):
-        cmd = ["helm", "template", self.instance, f'charts/{self.chart_name}', "-f", self.get_values_path("base.yaml"), "-f",
-               self.get_values_path(f"{self.env}.yaml"), "--output-dir", self.output_dir]
+        cmd = ["helm", "template", self.instance,
+               f'charts/{self.chart_name}', "--output-dir", self.output_dir]
+        for values in self.get_values_path:
+            cmd.append("-f")
+            cmd.append(values)
         return ' '.join(cmd)
 
     def helm_template(self):

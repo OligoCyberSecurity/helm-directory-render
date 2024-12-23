@@ -26,17 +26,17 @@ PATTERN_REG = re.compile(pattern)  # Match all files ending with input pattern"
 output = list()
 templates: List[TraversalRecord] = []
 instance = os.path.basename(input_path)
-helm_path = os.path.join(input_path, pattern) + "/"
 for root, _, files in os.walk(input_path):
     # in root dir we have globals.yaml but in every other dir we have base, dev, prod...
     if len(files) > 0 and PATTERN_REG.search(root):
-        component_path = root.replace(helm_path, "")
         logging.info("Found dir: %s", root)
         templates.append(TraversalRecord(input_path=input_path,
                                          env=env,
                                          instance=instance,
-                                         component_path=component_path,
-                                         chart_name=chart_name))
+                                         values_path=root,
+                                         chart_name=chart_name,
+                                         helm_path=pattern,
+                                         rendered_path=rendered_path_input))
 
 
 for template in templates:
