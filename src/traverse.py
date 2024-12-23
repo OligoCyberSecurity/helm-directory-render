@@ -13,37 +13,36 @@ logging.basicConfig(level=logging.INFO,
 
 # get the input and convert it to int
 env = os.environ.get("INPUT_ENVIRONMENT")
-root_dir = os.environ.get("INPUT_DIRECTORY")
+input_path = os.environ.get("INPUT_DIRECTORY").rstrip("/") + "/"
 pattern = os.environ.get("INPUT_PATTERN")
 chart_name = os.environ.get("INPUT_CHART")
 rendered_path_input = os.environ.get("INPUT_RENDERED_PATH", "rendered").strip()
-use_globals = os.environ.get(
-    "INPUT_USE_GLOBALS", "false").strip().lower() == "true"
 # Check if required inputs are provided
-if not env or not root_dir or not pattern or not chart_name:
+if not env or not input_path or not pattern or not chart_name:
     logging.error("Missing required input")
     sys.exit(1)
 PATTERN_REG = re.compile(pattern)  # Match all files ending with input pattern"
 
 output = list()
-output_base_path = f"{root_dir}/{rendered_path_input}"
 templates: List[TraversalRecord] = []
-for root, dir, _ in os.walk(root_dir):
-    for d in dir:
-        full_path = os.path.join(root, d)
-        if PATTERN_REG.search(full_path):
-            logging.info("Found dir: %s", full_path)
-            templates.append(TraversalRecord(base_path=root,
-                                             values_path=full_path,
-                                             output_base_path=output_base_path,
-                                             env=env,
-                                             name=d,
-                                             chart_name=chart_name,
-                                             use_globals=use_globals))
+instance = os.path.basename(input_path)
+for root, _, files in os.walk(input_path):
+    # in root dir we have globals.yaml but in every other dir we have base, dev, prod...
+    if len(files) > 0 and PATTERN_REG.search(root):
+        logging.info("Found dir: %s", root)
+        templates.append(TraversalRecord(input_path=input_path,
+                                         env=env,
+                                         instance=instance,
+                                         values_path=root,
+                                         chart_name=chart_name,
+                                         helm_path=pattern,
+                                         rendered_path=rendered_path_input))
+
 
 for template in templates:
     template.helm_template()
     output.append(template)
+    template.normalize_path()
 
 # to set output, print to shell in following syntax
 print("::set-output name=jobs:: " +
