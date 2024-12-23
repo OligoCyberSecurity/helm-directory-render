@@ -12,11 +12,10 @@ class TraversalRecord(BaseModel):
         BaseModel (_type_): _description_
     """
     input_path: str
-    component_path: str
     env: str
     chart_name: str
-    instance: str = Field(init=True)
-    use_globals: bool = Field(default=False)
+    component_path: str
+    instance: str
     helm_path: str = Field(default="helm")
     rendered_path: str = Field(default="rendered")
 
@@ -28,12 +27,8 @@ class TraversalRecord(BaseModel):
         return os.path.join(self.input_path, self.rendered_path, self.env, self.component_path)
 
     def helm_exec_string(self):
-        cmd = ["helm", "template", self.instance, f'charts/{self.chart_name}']
-        if self.use_globals:
-            cmd.extend(
-                ["-f", os.path.join(self.input_path, self.helm_path, "globals.yaml")])
-        cmd.extend(["-f", self.get_values_path("base.yaml"), "-f",
-                   self.get_values_path(f"{self.env}.yaml"), "--output-dir", self.output_dir])
+        cmd = ["helm", "template", self.instance, f'charts/{self.chart_name}', "-f", self.get_values_path("base.yaml"), "-f",
+               self.get_values_path(f"{self.env}.yaml"), "--output-dir", self.output_dir]
         return ' '.join(cmd)
 
     def helm_template(self):
