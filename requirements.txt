@@ -1,2 +1,9 @@
-pytest
-pydantic
+annotated-types==0.7.0
+iniconfig==2.0.0
+packaging==24.2
+pluggy==1.5.0
+pydantic==2.10.4
+pydantic_core==2.27.2
+pytest==8.3.4
+PyYAML==6.0.2
+typing_extensions==4.12.2
