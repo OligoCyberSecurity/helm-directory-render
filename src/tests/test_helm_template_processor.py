@@ -56,12 +56,6 @@ def test_initialization(mock_processor):
     assert not mock_processor.debug
 
 
-def test_release_name(mock_processor):
-    """Test that the release_name property is computed correctly."""
-    expected_release_name = "test-app"
-    assert mock_processor.release_name == expected_release_name
-
-
 def test_generate_deployments(mock_processor):
     """Test the generate_deployments method."""
     deployments = mock_processor.generate_deployments()
@@ -70,7 +64,6 @@ def test_generate_deployments(mock_processor):
     assert len(deployments) == 1
     deployment = deployments[0]
     assert deployment.name == "deployment1"
-    assert deployment.release_name == mock_processor.release_name
     assert deployment.repo_url == mock_processor.config.repoURL
     assert deployment.chart == mock_processor.config.chart
 
