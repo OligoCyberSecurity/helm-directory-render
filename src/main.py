@@ -32,12 +32,11 @@ def main():
     args = parser.parse_args()
 
     templates: List[HelmTemplateProcessor] = []
-    helm_path = os.path.join(args.directory, c.HELM_DIR)
-    app_name = os.path.basename(args.directory)
 
-    for root, _, files in os.walk(helm_path):
+    for root, _, files in os.walk(args.directory):
         if c.CONFIG_FILE in files:
             print(f"Found config file in {root}")
+            app_name = root.replace(args.directory, "").split("/")[0]
             templates.append(HelmTemplateProcessor(
                 app_name=app_name, config_path=root, filter=args.filter, debug=args.debug))
 
