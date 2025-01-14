@@ -24,6 +24,7 @@ class Deployment(BaseModel):
             "--namespace", self.namespace,
             "--version", self.target_revision,
             "--output-dir", self.output_dir,
+            "--dependency-update",
         ]
 
         for file in self.values:
