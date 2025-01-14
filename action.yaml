@@ -33,5 +33,5 @@ runs:
       shell: bash
     - name: Fetch rendered list
       id: get-results
-      run: python ${{ github.action_path }}/src/cli.py
+      run: python ${{ github.action_path }}/src/main.py --directory ${{ inputs.directory }}
       shell: bash
