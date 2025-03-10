@@ -27,6 +27,12 @@ class HelmTemplateProcessor(BaseModel):
     def values(self, deployment: str):
         return [os.path.join(self.config_path, f) for f in [c.BASE_VALUES, f"{deployment}.yaml"]]
 
+    @property
+    def name(self):
+        relative_path = '-'.join(self.config_path.split(c.HELM_DIR)
+                                 [1].strip("/").split("/"))
+        return f"{self.app_name}-{relative_path}"
+
     def generate_deployments(self) -> List[Deployment]:
         deployment_filter = re.compile(self.filter)
         deployments: List[Deployment] = []
@@ -34,7 +40,7 @@ class HelmTemplateProcessor(BaseModel):
             if deployment.enabled and self.config.enabled and deployment_filter.match(deployment.name):
                 deployments.append(
                     Deployment(
-                        name=deployment.name,
+                        name=self.name,
                         release_name=self.app_name,
                         repo_url=self.config.repoURL,
                         chart=self.config.chart,
