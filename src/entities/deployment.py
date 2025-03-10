@@ -23,6 +23,7 @@ class Deployment(BaseModel):
             f'{self.repo_url}/{self.chart}',
             "--namespace", self.namespace,
             "--version", self.target_revision,
+            "--set", f"fullnameOverride={self.name}",
             "--output-dir", self.output_dir,
             "--dependency-update",
         ]
