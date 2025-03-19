@@ -43,6 +43,24 @@ def main():
     for template in templates:
         deployments.extend(template.generate_deployments())
 
+    charts = {}
+    for deployment in deployments:
+        chart_key = f"{deployment.chart}-{deployment.target_revision}"
+        if chart_key not in charts:
+            charts[chart_key] = {
+                'repo_url': deployment.repo_url,
+                'version': deployment.target_revision,
+                'chart': deployment.chart
+            }
+    for values in charts.values():
+        repo_url = values['repo_url']
+        chart = values['chart']
+        version = values['version']
+        if not os.path.exists(f"{c.CHARTS_DIR}/{chart}/{version}"):
+            os.makedirs(f"{c.CHARTS_DIR}/{chart}/{version}")
+        os.system(
+            f"helm pull {repo_url}/{chart} --version {version} --untar --untardir {c.CHARTS_DIR}/{chart}/{version}")
+
     for deployment in deployments:
         deployment.render()
 

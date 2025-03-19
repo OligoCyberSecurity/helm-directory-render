@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from pydantic import BaseModel
 from typing import List
+import constants as c
 
 
 class Deployment(BaseModel):
@@ -20,12 +21,11 @@ class Deployment(BaseModel):
     def helm_cmd(self):
         cmd = [
             "helm", "template", self.release_name,
-            f'{self.repo_url}/{self.chart}',
+            f'{c.CHARTS_DIR}/{self.chart}/{self.target_revision}/{self.chart}',
             "--namespace", self.namespace,
             "--version", self.target_revision,
             "--set", f"fullnameOverride={self.name}",
             "--output-dir", self.output_dir,
-            "--dependency-update",
         ]
 
         for file in self.values:
