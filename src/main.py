@@ -1,13 +1,17 @@
-import argparse
 import os
+import argparse
+import subprocess
+import concurrent.futures
+import logging
+from pathlib import Path
 from typing import List
 from entities.helm_template_processor import HelmTemplateProcessor
 from entities.deployment import Deployment
 from utils.logger import setup_logging
 import constants as c
 
-# Setup logging
 setup_logging()
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -16,32 +20,42 @@ def main():
         "--directory",
         default=os.environ.get("HELM_TEMPLATE_PROCESSOR_DIRECTORY"),
         required=True,
-        type=str,
+        type=Path,
         help="Directory to traverse"
     )
-    parser.add_argument("--filter", default=".*", required=False,
-                        type=str, help="Filter deployments")
+    parser.add_argument("--filter", default=".*",
+                        required=False, type=str, help="Filter deployments")
     parser.add_argument(
         "--debug",
+        action=argparse.BooleanOptionalAction,
         default=os.environ.get(
-            "HELM_TEMPLATE_PROCESSOR_DEBUG", "false") == "true",
-        required=False,
-        type=bool,
+            "HELM_TEMPLATE_PROCESSOR_DEBUG", "false").lower() == "true",
         help="Debug mode"
     )
     args = parser.parse_args()
 
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    logger.setLevel(log_level)
+    logger.debug("Debug mode enabled")
+
     templates: List[HelmTemplateProcessor] = []
-    app_name = os.path.basename(args.directory)
-    for root, _, files in os.walk(args.directory):
-        if c.CONFIG_FILE in files:
-            print(f"Found config file in {root}")
-            templates.append(HelmTemplateProcessor(
-                app_name=app_name, config_path=root, filter=args.filter, debug=args.debug))
+    app_name = args.directory.name
+
+    for config_file in args.directory.rglob(c.CONFIG_FILE):
+        logger.info(f"Found config file in {config_file.parent}")
+        templates.append(
+            HelmTemplateProcessor(
+                app_name=app_name, config_path=config_file.parent, filter=args.filter, debug=args.debug
+            )
+        )
 
     deployments: List[Deployment] = []
     for template in templates:
-        deployments.extend(template.generate_deployments())
+        try:
+            deployments.extend(template.generate_deployments())
+        except Exception as e:
+            logger.error(
+                f"Failed to generate deployments for {template.config_path}: {e}", exc_info=True)
 
     charts = {}
     for deployment in deployments:
@@ -52,17 +66,39 @@ def main():
                 'version': deployment.target_revision,
                 'chart': deployment.chart
             }
-    for values in charts.values():
-        repo_url = values['repo_url']
-        chart = values['chart']
-        version = values['version']
-        if not os.path.exists(f"{c.CHARTS_DIR}/{chart}/{version}"):
-            os.makedirs(f"{c.CHARTS_DIR}/{chart}/{version}")
-        os.system(
-            f"helm pull {repo_url}/{chart} --version {version} --untar --untardir {c.CHARTS_DIR}/{chart}/{version}")
 
-    for deployment in deployments:
-        deployment.render()
+    def download_chart(values):
+        repo_url, chart, version = values['repo_url'], values['chart'], values['version']
+        chart_dir = Path(c.CHARTS_DIR) / chart / version
+
+        if not chart_dir.exists():
+            chart_dir.mkdir(parents=True, exist_ok=True)
+            try:
+                logger.info(
+                    f"Downloading chart {chart} version {version} from {repo_url}")
+                subprocess.run(
+                    ["helm", "pull", f"{repo_url}/{chart}",
+                        "--version", version, "--untar"],
+                    check=True,
+                    cwd=str(chart_dir)
+                )
+            except subprocess.CalledProcessError as e:
+                logger.error(
+                    f"Failed to download chart {chart} version {version}: {e}", exc_info=True)
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(download_chart, charts.values())
+
+    def render_deployment(deployment):
+        try:
+            deployment.render()
+            logger.info(f"Successfully rendered deployment: {deployment}")
+        except Exception as e:
+            logger.error(
+                f"Failed to render deployment {deployment}: {e}", exc_info=True)
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(render_deployment, deployments)
 
 
 if __name__ == "__main__":
